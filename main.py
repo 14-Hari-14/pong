@@ -8,7 +8,7 @@ pygame.init()
 
 # Set up the screen
 screen_width, screen_height = 800, 600
-screen = pygame.display.set_mode((screen_width, screen_height))githu
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('PONG')
 
 # setting up sounds used in the game
@@ -23,6 +23,9 @@ BLACK = (0, 0, 0)
 
 # default game state
 game_state = "Menu"
+
+# No of players playing the game
+player_no = 0
 
 # Setting the height and width of components
 
@@ -54,6 +57,10 @@ back_rectangle_y = (screen_height - back_rectangle_height) // 1.1
 onep_rectangle_x = (screen_width - start_rectangle_width) // 2
 onep_rectangle_y = (screen_height - start_rectangle_height) // 4
 
+# Positioning the 2P mode button of the game
+twop_rectangle_x = (screen_width - start_rectangle_width) // 2
+twop_rectangle_y = (screen_height - start_rectangle_height) // 2
+
 # Positioning the line that will divide the screen in 2 for 2 players
 line_thickness = 4
 vertical_line_x = screen_width // 2  # X-coordinate of the vertical line
@@ -71,6 +78,7 @@ rectangle_settings = pygame.Rect(settings_rectangle_x, settings_rectangle_y, set
                                  settings_rectangle_height)
 rectangle_back = pygame.Rect(back_rectangle_x, back_rectangle_y, back_rectangle_width, back_rectangle_height)
 rectangle_onep = pygame.Rect(onep_rectangle_x, onep_rectangle_y, start_rectangle_width, start_rectangle_height)
+rectangle_twop = pygame.Rect(twop_rectangle_x, twop_rectangle_y, start_rectangle_width, start_rectangle_height)
 
 # Set up font
 font = pygame.font.Font("Grand9K Pixel.ttf", 100)  # None means default font, 100 is the font size
@@ -83,7 +91,7 @@ start_text = font_start.render("START", True, WHITE)
 settings_text = font_start.render("SETTINGS", True, WHITE)
 back_text = font_back.render("BACK", True, WHITE)
 onep_text = font_start.render("1P", True, WHITE)
-
+twop_text = font_start.render("2P",True, WHITE)
 # Functions for initializing buttons on the screen
 
 
@@ -109,6 +117,11 @@ def single_player_mode_button_init():
     pygame.draw.rect(screen, WHITE, rectangle_onep, rectangle_thickness)
     text_onep_rect = onep_text.get_rect(center=rectangle_onep.center)
     screen.blit(onep_text, text_onep_rect)
+
+def two_player_mode_button_init():
+    pygame.draw.rect(screen, WHITE, rectangle_twop, rectangle_thickness)
+    text_twop_rect = twop_text.get_rect(center=rectangle_twop.center)
+    screen.blit(twop_text, text_twop_rect)
 
 def reset_game():
     global scoreL, scoreR, left_paddle, right_paddle, puck, puck_speed_x, puck_speed_y
@@ -203,8 +216,13 @@ while running:
 
             elif game_state == "GameMode":
                 if rectangle_onep.collidepoint(event.pos):
+                    player_no=1
                     print("1P Button Clicked")
-                    game_state = "Gameplay1P"
+                    game_state = "Gameplay"
+                if rectangle_twop.collidepoint(event.pos):
+                    player_no=2
+                    print("2P Button Clicked")
+                    game_state = "Gameplay"
                 elif rectangle_back.collidepoint(event.pos):
                     print("Back Button Clicked")
                     game_state = "Menu"
@@ -231,6 +249,7 @@ while running:
 
     elif game_state == "GameMode":
         single_player_mode_button_init()
+        two_player_mode_button_init()
         print("R: " + str(scoreR))
         print("L: " + str(scoreL))
         back_button_init()
@@ -262,7 +281,7 @@ while running:
         # Update the display
         pygame.display.flip()
 
-    elif game_state == "Gameplay1P":
+    elif game_state == "Gameplay":
         for y in range(0, screen_height, 10):
             pygame.draw.line(screen, WHITE, (vertical_line_x, y), (vertical_line_x, y + 1), line_thickness)
 
@@ -290,10 +309,36 @@ while running:
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w] and left_paddle_y > 0:
-            left_paddle_y -= paddle_speed
-        if keys[pygame.K_s] and left_paddle_y < screen_height - paddle_height:
-            left_paddle_y += paddle_speed
+        # Inside the game loop, after checking for events and before updating the display
+        if player_no == 1:
+            # Calculate the center position of the computer-controlled paddle
+            comp_paddle_center_y = left_paddle.y + paddle_height // 2
+
+            # Calculate the center position of the puck
+            puck_center_y = puck.y + 15  # Assuming the puck is a 30x30 square
+
+            # Determine the direction in which the paddle should move
+            if comp_paddle_center_y < puck_center_y:
+                left_paddle_y += paddle_speed  # Move paddle down
+            elif comp_paddle_center_y > puck_center_y:
+                left_paddle_y -= paddle_speed  # Move paddle up
+
+            # Ensure that the paddle stays within the screen boundariess
+            if left_paddle_y < 0:
+                left_paddle_y = 0
+            elif left_paddle_y > screen_height - paddle_height:
+                left_paddle_y = screen_height - paddle_height
+
+        # Update the position of the computer-controlled paddle
+        left_paddle.y = left_paddle_y
+
+        if player_no == 2:
+            if keys[pygame.K_w] and left_paddle_y > 0:
+                left_paddle_y -= paddle_speed
+            if keys[pygame.K_s] and left_paddle_y < screen_height - paddle_height:
+                left_paddle_y += paddle_speed
+       
+       
         if keys[pygame.K_UP] and right_paddle_y > 0:
             right_paddle_y -= paddle_speed
         if keys[pygame.K_DOWN] and right_paddle_y < screen_height - paddle_height:
