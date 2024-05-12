@@ -250,8 +250,6 @@ while running:
     elif game_state == "GameMode":
         single_player_mode_button_init()
         two_player_mode_button_init()
-        print("R: " + str(scoreR))
-        print("L: " + str(scoreL))
         back_button_init()
 
     elif game_state == "Settings":
@@ -375,6 +373,7 @@ while running:
             puck_speed_y = random.choice([-4, 4])
         if scoreL == 5 or scoreR == 5:
             game_state = "Victory"
+            win_sound.play()
 
         # Check for collisions between the puck and paddles
         if puck.colliderect(left_paddle) or puck.colliderect(right_paddle):
@@ -401,19 +400,21 @@ while running:
         clock.tick(60)
 
     elif game_state == "Victory":
-        rectangle_win = pygame.Rect(pong_rectangle_x//15, pong_rectangle_y//8, screen_width, pong_rectangle_height)
-        win_sound.play()
+        rectangle_win = pygame.Rect(0, 0, screen_width, screen_height)
         if scoreR == 5:
+            #print("R:",scoreR)
             win1_text = font_start.render("PLAYER 1 WINS", True, WHITE)  # Render the text
-            pygame.draw.rect(screen, BGCOLOR, rectangle_win, rectangle_thickness)
-            text_win1_rect = win1_text.get_rect(center=rectangle.center)
-            screen.blit(win1_text, text_win1_rect)
-
-        else:
+            win_text = win1_text
+            
+        elif scoreL == 5:
+            #print("L:",scoreL)
             win2_text = font_start.render("PLAYER 2 WINS", True, WHITE)  # Render the text
-            pygame.draw.rect(screen, BGCOLOR, rectangle_win, rectangle_thickness)
-            text_win2_rect = win2_text.get_rect(center=rectangle.center)
-            screen.blit(win2_text, text_win2_rect)
+            win_text = win2_text
+
+        pygame.draw.rect(screen, BGCOLOR, rectangle_win, rectangle_thickness)
+        text_win_rect = win_text.get_rect(center=rectangle.center)
+        screen.blit(win_text, text_win_rect)
+
         back_button_init()
         reset_game()
 
