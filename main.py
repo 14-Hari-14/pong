@@ -41,10 +41,10 @@ start_rectangle_x = (screen_width - start_rectangle_width) // 2
 start_rectangle_y = (screen_height - start_rectangle_height) // 2
 
 
-settings_rectangle_width, settings_rectangle_height = 400, 100
-# Positioning the settings button of the game
-settings_rectangle_x = (screen_width - settings_rectangle_width) // 2
-settings_rectangle_y = (screen_height - settings_rectangle_height) // 1.3
+credits_rectangle_width, credits_rectangle_height = 400, 100
+# Positioning the credits button of the game
+credits_rectangle_x = (screen_width - credits_rectangle_width) // 2
+credits_rectangle_y = (screen_height - credits_rectangle_height) // 1.3
 
 
 back_rectangle_width, back_rectangle_height = 180, 90
@@ -74,8 +74,8 @@ rectangle_thickness = 10
 rectangle = pygame.Rect(pong_rectangle_x, pong_rectangle_y, pong_rectangle_width, pong_rectangle_height)
 
 rectangle_start = pygame.Rect(start_rectangle_x, start_rectangle_y, start_rectangle_width, start_rectangle_height)
-rectangle_settings = pygame.Rect(settings_rectangle_x, settings_rectangle_y, settings_rectangle_width,
-                                 settings_rectangle_height)
+rectangle_credits = pygame.Rect(credits_rectangle_x, credits_rectangle_y, credits_rectangle_width,
+                                 credits_rectangle_height)
 rectangle_back = pygame.Rect(back_rectangle_x, back_rectangle_y, back_rectangle_width, back_rectangle_height)
 rectangle_onep = pygame.Rect(onep_rectangle_x, onep_rectangle_y, start_rectangle_width, start_rectangle_height)
 rectangle_twop = pygame.Rect(twop_rectangle_x, twop_rectangle_y, start_rectangle_width, start_rectangle_height)
@@ -88,7 +88,7 @@ font_back = pygame.font.Font("Grand9K Pixel.ttf", 30)
 # Create the text
 pong_text = font.render("PONG", True, WHITE)  # Render the text
 start_text = font_start.render("START", True, WHITE)
-settings_text = font_start.render("SETTINGS", True, WHITE)
+credits_text = font_start.render("CREDITS", True, WHITE)
 back_text = font_back.render("BACK", True, WHITE)
 onep_text = font_start.render("1P", True, WHITE)
 twop_text = font_start.render("2P",True, WHITE)
@@ -107,10 +107,10 @@ def start_button_init():
     screen.blit(start_text, text_start_rect)
 
 
-def settings_button_init():
-    pygame.draw.rect(screen, WHITE, rectangle_settings, rectangle_thickness)
-    text_settings_rect = settings_text.get_rect(center=rectangle_settings.center)
-    screen.blit(settings_text, text_settings_rect)
+def credits_button_init():
+    pygame.draw.rect(screen, WHITE, rectangle_credits, rectangle_thickness)
+    text_credits_rect = credits_text.get_rect(center=rectangle_credits.center)
+    screen.blit(credits_text, text_credits_rect)
 
 
 def single_player_mode_button_init():
@@ -180,6 +180,7 @@ speed_time_increment = 1000
 
 
 # Slider properties
+'''
 slider_width, slider_height = 200, 20
 slider_x, slider_y = 200, 90
 slider_rect = pygame.Rect(slider_x, slider_y, slider_width, slider_height)
@@ -191,6 +192,7 @@ min_value, max_value = 0, 255  # Minimum and maximum values for the slider
 def draw_slider():  # Function to draw the slider
     pygame.draw.rect(screen, BLACK, slider_rect)
     pygame.draw.circle(screen, WHITE, (slider_rect.x + slider_value * 2, slider_y + slider_height // 2), 12)
+'''
 
 
 # Main game loop
@@ -200,16 +202,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            # Check if the left mouse button is clicked within the start or settings button area
+            # Check if the left mouse button is clicked within the start or credits button area
             if game_state == "Menu":
                 if rectangle_start.collidepoint(event.pos):
                     print("Start Button Clicked!")  # Perform actions when the start button is clicked
                     game_state = "GameMode"
-                elif rectangle_settings.collidepoint(event.pos):
-                    print("Settings Button Clicked!")
-                    game_state = "Settings"
+                elif rectangle_credits.collidepoint(event.pos):
+                    print("credits Button Clicked!")
+                    game_state = "credits"
 
-            elif game_state == "Settings":
+            elif game_state == "credits":
                 if rectangle_back.collidepoint(event.pos):
                     print("Back Button Clicked")
                     game_state = "Menu"
@@ -239,7 +241,7 @@ while running:
         # Draw an empty rectangle on the screen
         pygame.draw.rect(screen, WHITE, rectangle, rectangle_thickness)
         start_button_init()
-        settings_button_init()
+        credits_button_init()
 
         # Get the rectangle for the rendered text
         text_rect = pong_text.get_rect(center=rectangle.center)
@@ -252,7 +254,22 @@ while running:
         two_player_mode_button_init()
         back_button_init()
 
-    elif game_state == "Settings":
+    elif game_state == "credits":
+        # Developer text
+        developer_text1 = font_start.render("Developer: Hari", True, WHITE)
+        developer_text2 = font_back.render("Yeah that's it, a solo project", True, WHITE)
+
+        # Positioning the developer text
+        developer_text1_x = (screen_width - developer_text1.get_width()) // 2
+        developer_text1_y = screen_height // 3
+        developer_text2_x = (screen_width - developer_text2.get_width()) // 2
+        developer_text2_y = developer_text1_y + developer_text1.get_height()
+
+        # Blitting the developer text onto the screen
+        screen.blit(developer_text1, (developer_text1_x, developer_text1_y))
+        screen.blit(developer_text2, (developer_text2_x, developer_text2_y))
+
+        '''
         red_text = font_start.render("R: ", True, WHITE)
         green_text = font_start.render("G: ", True, WHITE)
         blue_text = font_start.render("B: ", True, WHITE)
@@ -273,6 +290,7 @@ while running:
 
         # Draw the slider
         draw_slider()
+        '''
 
         back_button_init()
 
